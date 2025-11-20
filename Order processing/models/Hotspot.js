@@ -1,0 +1,1 @@
+// Add your schema for the delivery personnal hotspots here

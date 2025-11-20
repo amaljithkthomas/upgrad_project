@@ -1,0 +1,6 @@
+{
+    "your-gemini-Api-Key": "",
+    "mongoURI": "mongodb://127.0.0.1:27017/quick_commerce_db",
+    "jwtSecret": "f6d0cd4faef82ded6ad2c06e2115c0cb877d2313baa389197c48ac41ced29f6d",
+    "port": ""
+}
