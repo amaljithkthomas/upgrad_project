@@ -11,7 +11,8 @@ router.post('/signup', async (req, res) => {
   try {
     const { email, password, name } = req.body;
     
-    console.log('Signup attempt:', email);
+    console.log('\n📝 SIGNUP REQUEST');
+    console.log('Email:', email);
     
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password required' });
@@ -21,7 +22,7 @@ router.post('/signup', async (req, res) => {
     const existing = await User.findOne({ email: normalizedEmail });
     
     if (existing) {
-      console.log('User already exists:', normalizedEmail);
+      console.log('❌ User exists');
       return res.status(400).json({ message: 'User already exists' });
     }
 
@@ -32,15 +33,15 @@ router.post('/signup', async (req, res) => {
       email: normalizedEmail, 
       password: hash,
       name: name || email.split('@')[0],
-      cart: [] // Initialize empty cart
+      cart: []
     });
     
     await user.save();
-    console.log('✅ User created:', normalizedEmail);
+    console.log('✅ User created');
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
-    console.error('Signup error:', err);
+    console.error('❌ Signup error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -50,7 +51,11 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    console.log('Login attempt:', email);
+    console.log('\n' + '='.repeat(60));
+    console.log('🔐 LOGIN REQUEST');
+    console.log('='.repeat(60));
+    console.log('Email:', email);
+    console.log('Origin:', req.headers.origin);
     
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password required' });
@@ -60,36 +65,57 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email: normalizedEmail });
     
     if (!user) {
-      console.log('User not found:', normalizedEmail);
+      console.log('❌ User not found');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    console.log('User found, comparing password...');
+    console.log('✅ User found');
+
     const isMatch = await bcrypt.compare(password, user.password);
     
     if (!isMatch) {
-      console.log('Password mismatch');
+      console.log('❌ Password incorrect');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET || config.get('jwtSecret'),
-      { expiresIn: '7d' }
-    );
+    console.log('✅ Password correct');
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
-    console.log('✅ Login successful:', normalizedEmail);
+    // Create JWT payload
+    const payload = {
+      id: user._id.toString(),
+      email: user.email
+    };
     
-    res.json({ 
+    const secret = process.env.JWT_SECRET || config.get('jwtSecret');
+    const token = jwt.sign(payload, secret, { expiresIn: '7d' });
+    
+    console.log('✅ JWT Token created');
+    console.log('Token (first 50 chars):', token.substring(0, 50) + '...');
+    console.log('Payload:', payload);
+    console.log('Token expires in: 7 days');
+
+    // CRITICAL: Set cookie with correct options
+    const cookieOptions = {
+      httpOnly: true,
+      secure: false, // false for localhost, true for production HTTPS
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      path: '/'
+    };
+
+    res.cookie('token', token, cookieOptions);
+    
+    console.log('✅ Cookie set');
+    console.log('Cookie name: token');
+    console.log('Cookie options:', JSON.stringify(cookieOptions, null, 2));
+    console.log('='.repeat(60));
+    console.log('✅ LOGIN SUCCESSFUL');
+    console.log('='.repeat(60) + '\n');
+
+    // Send response
+    res.json({
       message: 'Logged in successfully',
-      token,
+      token, // Also send token in response body for debugging
       user: {
         id: user._id,
         email: user.email,
@@ -97,35 +123,67 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('❌ Login error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  res.clearCookie('token', { httpOnly: true, sameSite: 'lax', secure: false });
+  console.log('\n👋 LOGOUT REQUEST');
+  
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false,
+    path: '/'
+  });
+  
+  console.log('✅ Cookie cleared');
   res.json({ message: 'Logged out successfully' });
 });
 
 // GET /api/auth/status
 router.get('/status', (req, res) => {
+  console.log('\n📊 STATUS CHECK');
+  console.log('Cookies:', req.cookies);
+  console.log('Has token:', !!req.cookies?.token);
+  
   const token = req.cookies?.token;
+  
   if (!token) {
+    console.log('❌ No token');
     return res.json({ authenticated: false });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || config.get('jwtSecret'));
-    res.json({ authenticated: true, userId: decoded.id });
+    const secret = process.env.JWT_SECRET || config.get('jwtSecret');
+    const decoded = jwt.verify(token, secret);
+    
+    console.log('✅ User authenticated');
+    console.log('User ID:', decoded.id);
+    
+    res.json({ 
+      authenticated: true, 
+      userId: decoded.id,
+      email: decoded.email
+    });
   } catch (err) {
+    console.log('❌ Invalid token:', err.message);
     res.json({ authenticated: false });
   }
 });
 
-// GET /api/auth/protected
+// GET /api/auth/protected (test route)
 router.get('/protected', auth, (req, res) => {
-  res.json({ ok: true, userId: req.user });
+  console.log('\n🔒 PROTECTED ROUTE');
+  console.log('User:', req.user);
+  
+  res.json({ 
+    ok: true, 
+    userId: req.user.id,
+    email: req.user.email
+  });
 });
 
 module.exports = router;
