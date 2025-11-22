@@ -126,10 +126,12 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/order'); // NEW
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes); // NEW
 
 // Health check
 app.get('/health', (req, res) => {
