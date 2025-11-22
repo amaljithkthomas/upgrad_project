@@ -158,20 +158,69 @@ router.post('/', async (req, res) => {
   }
 });
 
+// router.get('/', async (req, res) => {
+//   try {
+//     console.log('\n📋 GET /api/orders');
+//     console.log('User ID:', req.user.id);
+
+//     const orders = await Order.find({ userId: req.user.id })
+//       .sort({ orderPlacedAt: -1 })
+//       .lean();
+
+//     console.log('✅ Found', orders.length, 'orders');
+
+//     res.json(orders);
+//   } catch (err) {
+//     console.error('❌ Get orders error:', err);
+//     res.status(500).json({ msg: 'Failed to fetch orders', error: err.message });
+//   }
+// });
+
+// router.get('/:orderId', async (req, res) => {
+//   try {
+//     const { orderId } = req.params;
+    
+//     console.log('\n🔍 GET /api/orders/:orderId');
+//     console.log('Order ID:', orderId);
+//     console.log('User ID:', req.user.id);
+
+//     const order = await Order.findOne({ 
+//       orderId,
+//       userId: req.user.id 
+//     }).lean();
+
+//     if (!order) {
+//       console.log('❌ Order not found');
+//       return res.status(404).json({ msg: 'Order not found' });
+//     }
+
+//     console.log('✅ Order found:', order.status);
+
+//     res.json(order);
+//   } catch (err) {
+//     console.error('❌ Get order error:', err);
+//     res.status(500).json({ msg: 'Failed to fetch order', error: err.message });
+//   }
+// });
+
+
 router.get('/', async (req, res) => {
   try {
     console.log('\n📋 GET /api/orders');
-    console.log('User ID:', req.user.id);
+    console.log('User ID from token:', req.user.id);
+    console.log('User object:', req.user);
 
     const orders = await Order.find({ userId: req.user.id })
       .sort({ orderPlacedAt: -1 })
       .lean();
 
     console.log('✅ Found', orders.length, 'orders');
+    console.log('Orders data:', JSON.stringify(orders, null, 2));
 
     res.json(orders);
   } catch (err) {
     console.error('❌ Get orders error:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).json({ msg: 'Failed to fetch orders', error: err.message });
   }
 });
@@ -182,7 +231,7 @@ router.get('/:orderId', async (req, res) => {
     
     console.log('\n🔍 GET /api/orders/:orderId');
     console.log('Order ID:', orderId);
-    console.log('User ID:', req.user.id);
+    console.log('User ID from token:', req.user.id);
 
     const order = await Order.findOne({ 
       orderId,
@@ -191,16 +240,20 @@ router.get('/:orderId', async (req, res) => {
 
     if (!order) {
       console.log('❌ Order not found');
+      console.log('Searching for orderId:', orderId, 'userId:', req.user.id);
       return res.status(404).json({ msg: 'Order not found' });
     }
 
     console.log('✅ Order found:', order.status);
+    console.log('Order details:', JSON.stringify(order, null, 2));
 
     res.json(order);
   } catch (err) {
     console.error('❌ Get order error:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).json({ msg: 'Failed to fetch order', error: err.message });
   }
 });
+
 
 module.exports = router;
