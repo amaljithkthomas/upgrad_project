@@ -13,7 +13,6 @@ export default function HomePage() {
     navigate('/login');
   };
 
-  // Show loading state while checking authentication
   if (authLoading) {
     return (
       <div className="max-w-4xl mx-auto p-8 text-center">
@@ -40,6 +39,7 @@ export default function HomePage() {
             >
               Browse Products
             </button>
+            
             <button
               onClick={() => navigate('/cart')}
               className="bg-yellow-600 text-white px-6 py-3 rounded hover:bg-yellow-700 relative transition-colors"
@@ -51,10 +51,17 @@ export default function HomePage() {
                 </span>
               )}
             </button>
+            
+            <button
+              onClick={() => navigate('/orders')}
+              className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 transition-colors"
+            >
+              My Orders
+            </button>
+            
             <button
               onClick={handleLogout}
               className="bg-red-600 text-white px-6 py-3 rounded hover:bg-red-700 transition-colors"
-              aria-label="Logout"
             >
               Logout
             </button>

@@ -16,6 +16,7 @@ export default function Cart() {
 
   if (!user) return null;
   if (loading) return <div className="p-8 text-center">Loading cart…</div>;
+  
   if (!cart.length) return (
     <div className="max-w-2xl mx-auto p-8 text-center">
       <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
@@ -69,6 +70,7 @@ export default function Cart() {
           Continue Shopping
         </button>
         <button
+          onClick={() => navigate('/checkout')}
           className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
         >
           Proceed to Checkout

@@ -6,6 +6,10 @@ import SignUp from './components/SignUp';
 import Protected from './components/Protected';
 import ProductList from './components/ProductList';
 import Cart from './components/Cart';
+import Checkout from './components/Checkout';
+import OrderConfirmation from './components/OrderConfirmation';
+import OrderHistory from './components/OrderHistory';
+import OrderDetails from './components/OrderDetails';
 import HomePage from './components/HomePage';
 import upGradLogo from '/upgrad_logo.png';
 import './App.css';
@@ -19,21 +23,48 @@ function App() {
   return (
     <>
       <div>
-        <a href="" target="_blank">
+        <a href="/" target="_blank">
           <img src={upGradLogo} className="logo" alt="upGrad logo" />
         </a>
       </div>
-      <h1>upGrad</h1>
+      <h1>upGrad Quick Commerce</h1>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/products" element={<ProductList />} />
+        
+        {/* Protected Routes */}
         <Route path="/cart" element={
           <RequireAuth>
             <Cart />
           </RequireAuth>
         } />
+        
+        <Route path="/checkout" element={
+          <RequireAuth>
+            <Checkout />
+          </RequireAuth>
+        } />
+        
+        <Route path="/order-confirmation/:orderId" element={
+          <RequireAuth>
+            <OrderConfirmation />
+          </RequireAuth>
+        } />
+        
+        <Route path="/orders" element={
+          <RequireAuth>
+            <OrderHistory />
+          </RequireAuth>
+        } />
+        
+        <Route path="/order-details/:orderId" element={
+          <RequireAuth>
+            <OrderDetails />
+          </RequireAuth>
+        } />
+        
         <Route path="/protected" element={
           <RequireAuth>
             <Protected />
