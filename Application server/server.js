@@ -126,20 +126,46 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 const cartRoutes = require('./routes/cart');
-const orderRoutes = require('./routes/order'); // NEW
+const orderRoutes = require('./routes/order');
+const warehouseRoutes = require('./routes/warehouse');
+const hotspotRoutes = require('./routes/hotspot');
 
+// Register Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api/orders', orderRoutes); // NEW
+app.use('/api/orders', orderRoutes);
+app.use('/api/warehouse', warehouseRoutes);
+app.use('/api/hotspot', hotspotRoutes);
 
-// Health check
+// Health Check Endpoint
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
-    cookieParser: 'active'
+    cookieParser: 'active',
+    routes: {
+      auth: '/api/auth',
+      products: '/api/products',
+      cart: '/api/cart',
+      orders: '/api/orders',
+      warehouse: '/api/warehouse',
+      hotspot: '/api/hotspot'
+    }
   });
+});
+
+// Data Seeding Endpoint (Development Only)
+app.post('/api/seed-data', async (req, res) => {
+  try {
+    console.log('\n🌱 Seeding database...');
+    const { seedAll } = require('./utils/seedData');
+    await seedAll();
+    res.json({ msg: 'Database seeded successfully' });
+  } catch (err) {
+    console.error('❌ Seeding error:', err);
+    res.status(500).json({ msg: 'Failed to seed database', error: err.message });
+  }
 });
 
 // =========================================
@@ -148,8 +174,12 @@ app.get('/health', (req, res) => {
 
 // 404
 app.use((req, res) => {
-  console.log('❌ 404:', req.path);
-  res.status(404).json({ msg: 'Route not found' });
+  console.log('❌ 404 Not Found:', req.method, req.path);
+  res.status(404).json({ 
+    msg: 'Route not found', 
+    path: req.path,
+    method: req.method 
+  });
 });
 
 // Global error handler
@@ -167,11 +197,19 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log('\n' + '='.repeat(60));
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log('\n' + '='.repeat(70));
+  console.log('🚀 upGrad Quick Commerce Backend Server');
+  console.log('='.repeat(70));
+  console.log(`✅ Server running on port: ${PORT}`);
   console.log(`✅ Frontend URL: http://localhost:5173`);
   console.log(`✅ Backend URL: http://localhost:${PORT}`);
-  console.log(`✅ CORS origin: http://localhost:5173`);
-  console.log(`✅ Cookies: Enabled`);
-  console.log('='.repeat(60) + '\n');
+  console.log(`✅ Health Check: http://localhost:${PORT}/health`);
+  console.log('\n📋 Available API Routes:');
+  console.log('   🔐 /api/auth           - Authentication');
+  console.log('   📦 /api/products       - Product Management');
+  console.log('   🛒 /api/cart           - Shopping Cart');
+  console.log('   📋 /api/orders         - Order Management');
+  console.log('   🏭 /api/warehouse      - Warehouse Management');
+  console.log('   📍 /api/hotspot        - Delivery Hotspot Management');
+  console.log('='.repeat(70) + '\n');
 });
