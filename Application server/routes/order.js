@@ -204,6 +204,9 @@ router.post('/', async (req, res) => {
     await user.save();
     console.log('✅ Cart cleared');
 
+    // Calculate per-stage delay in milliseconds
+    const stageDelayMs = Math.floor((estimatedMinutes * 60 * 1000) / 3);
+
     setTimeout(async () => {
       try {
         const orderToUpdate = await Order.findOne({ orderId });
@@ -220,7 +223,7 @@ router.post('/', async (req, res) => {
       } catch (err) {
         console.error('❌ Error updating order to Confirmed:', err);
       }
-    }, 5000);
+    }, stageDelayMs);
 
     setTimeout(async () => {
       try {
@@ -238,7 +241,7 @@ router.post('/', async (req, res) => {
       } catch (err) {
         console.error('❌ Error updating order to Shipped:', err);
       }
-    }, 15000);
+    }, stageDelayMs * 2);
 
     setTimeout(async () => {
       try {
@@ -268,7 +271,7 @@ router.post('/', async (req, res) => {
       } catch (err) {
         console.error('❌ Error updating order to Delivered:', err);
       }
-    }, 25000);
+    }, stageDelayMs * 3);
 
     res.status(201).json({
       msg: 'Order placed successfully',
