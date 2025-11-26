@@ -1,5 +1,5 @@
 {
-    "your-gemini-Api-Key": "",
+    "your-gemini-Api-Key": "AIzaSyAL-JM8oN8QMwlDD2dhub8wpCUg8_PmGgQ",
     "mongoURI": "mongodb://127.0.0.1:27017/quick_commerce_db",
     "jwtSecret": "f6d0cd4faef82ded6ad2c06e2115c0cb877d2313baa389197c48ac41ced29f6d",
     "port": ""

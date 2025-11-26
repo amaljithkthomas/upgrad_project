@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../AuthContext';
 import { CartContext } from '../CartContext';
+import Recommendations from './Recommendations';
 
 export default function HomePage() {
   const { user, signOut, authLoading } = useContext(AuthContext);
@@ -83,6 +84,7 @@ export default function HomePage() {
           </Link>
         </div>
       )}
+      <Recommendations />
     </div>
   );
 }

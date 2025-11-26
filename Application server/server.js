@@ -129,6 +129,7 @@ const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/order');
 const warehouseRoutes = require('./routes/warehouse');
 const hotspotRoutes = require('./routes/hotspot');
+const recommendationsRoutes = require('./routes/recommendations');
 
 // Register Routes
 app.use('/api/auth', authRoutes);
@@ -137,6 +138,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/warehouse', warehouseRoutes);
 app.use('/api/hotspot', hotspotRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
 
 // Health Check Endpoint
 app.get('/health', (req, res) => {
@@ -150,7 +152,8 @@ app.get('/health', (req, res) => {
       cart: '/api/cart',
       orders: '/api/orders',
       warehouse: '/api/warehouse',
-      hotspot: '/api/hotspot'
+      hotspot: '/api/hotspot',
+      recommendations: '/api/recommendations'
     }
   });
 });
@@ -211,5 +214,6 @@ app.listen(PORT, () => {
   console.log('   📋 /api/orders         - Order Management');
   console.log('   🏭 /api/warehouse      - Warehouse Management');
   console.log('   📍 /api/hotspot        - Delivery Hotspot Management');
+  console.log('   📊 /api/recommendations - Product Recommendations');
   console.log('='.repeat(70) + '\n');
 });
